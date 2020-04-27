@@ -20,11 +20,11 @@ ui <- dashboardPage(
   
   dashboardHeader(title = "用户权限设置",
                   tags$li(class = "dropdown", style = "padding: 8px;",
-                          shinyauthr::logoutUI("logout",label = '注销')),
-                  tags$li(class = "dropdown", 
-                          tags$a(icon("github"), 
-                                 href = "https://github.com/paulc91/shinyauthr",
-                                 title = "See the code on github"))
+                          uiOutput('show_user')),
+                  tags$li(class = "dropdown", style = "padding: 8px;",
+                          shinyauthr::logoutUI("logout",label = '注销'))
+                 
+                
   ),
   
   dashboardSidebar(collapsed = TRUE, 
@@ -39,7 +39,7 @@ ui <- dashboardPage(
               includeScript("returnClick.js")
     ),
     shinyauthr::loginUI("login",title = '登录界面',user_title = '用户名',pass_title = '密码',login_title = '登录',error_message = '用户名或密码错误,请重试！'),
-    uiOutput("user_table"),
+
     uiOutput("testUI"),
     HTML('<div data-iframe-height></div>')
   )
@@ -55,6 +55,8 @@ server <- function(input, output, session) {
                             algo = "md5",
                             log_out = reactive(logout_init()))
   
+
+  
   logout_init <- callModule(shinyauthr::logout, "logout", reactive(credentials()$user_auth))
   
   observe({
@@ -65,20 +67,20 @@ server <- function(input, output, session) {
     }
   })
   
-  output$user_table <- renderUI({
-    # only show pre-login
-    if(credentials()$user_auth) return(NULL)
-    
-    tagList(
-      tags$p("测试账号信息如下", class = "text-center"),
-      
-      renderTable({user_test})
-    )
-  })
-  
   user_info <- reactive({credentials()$info})
   
+  #显示用户信息
+  output$show_user <- renderUI({
+    req(credentials()$user_auth)
+    actionButton('currentUser',label =user_info()$Fname,icon = icon('user') )
+    
+  })
+  
+
+
+  
   user_data <- reactive({
+    
     req(credentials()$user_auth)
     
     if (user_info()$Fpermissions == "admin") {
@@ -89,11 +91,6 @@ server <- function(input, output, session) {
     
   })
   
-  output$welcome <- renderText({
-    req(credentials()$user_auth)
-    
-    glue("Welcome {user_info()$Fname}")
-  })
   
   output$testUI <- renderUI({
     req(credentials()$user_auth)
