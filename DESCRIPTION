@@ -2,7 +2,7 @@ Package: shinyauthr
 Type: Package
 Title: Shiny Authentication Modules
 Description: Easily add user authentication to shiny apps and build dynamic UIs based on user information.
-Version: 0.0.99
+Version: 1.0.1
 Author: Paul Campbell <pacampbell91@gmail.com>
 Maintainer: Paul Campbell <pacampbell91@gmail.com>
 License: MIT + file LICENSE
